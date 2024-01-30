@@ -1,0 +1,42 @@
+Create blank solution
+
+Create new project Class Library - Models
+add a class
+- Contracts (folder)
+-- API Interface
+-- Service Interface
+-- Data Interface
+- DbCrud (folder)
+-- ResponseData
+- Poco (folder)
+-- ResponseDataDto
+
+
+Create new project ASP.NET Core Web API - API
+Add a controller
+- Decorate it
+-- [ApiController]
+-- [Route("[controller]")]
+- SlatesController 
+-- inherit ControllerBase
+
+Create new project ASP.NET Core Web API - Service
+Add a controller
+- Decorate it
+-- [ApiController]
+-- [Route("[controller]")]
+- SlatesController 
+-- inherit ControllerBase
+Add some methods
+- [HttpGet(Name = "Ping")] (Is anybody there?)
+- CheckForDb (What is that noise?)
+-- CreateChamp
+-- CreateStat
+-- CreateAlignment
+-- CreateFaction
+--- UpsertCharStat
+--- UpsertCharAlign
+--- UpsertCharFaction
+---- UpsertChamp
+
+Create new project ASP.NET Core Web API - DataService

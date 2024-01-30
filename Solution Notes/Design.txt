@@ -1,0 +1,37 @@
+DB CRUD Models
+POCO Models
+	Alignment\Affinity
+	Faction\Race
+	Statistics
+
+Db Interface
+	Ping - response to indicate local API is available
+	CheckDb - check database connectivity
+	Init - create database and tables
+	Upsert Faction
+	Upsert Alignment
+App Interface
+	Vet Alignment
+	Vet Faction
+	Gather Alignment List
+	Gather Faction List
+API Interface
+	Request Create Faction
+	Request Create Alignment
+
+[Implementing]
+Database Project - contains CRUD methods that access the DB
+- depency on DB CRUD Models
+- using appsettings (or secrets) to access the dbms and the name of the database
+
+[Planning]
+Application Project - contains methods for app logic and makes requests to the database layer
+- depency on DB CRUD Models
+- dependency on POCO Models
+
+[Planning]
+API - contains request from the UI and returns POCO Json data for the UI in response
+- dependency on POCO models
+
+[Planning]
+UI

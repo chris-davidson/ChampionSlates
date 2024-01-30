@@ -1,0 +1,35 @@
+Projects
+
+Models - Single area to hold shared models, interfaces, constants and methods
+- Contract Interfaces
+- Crud
+- Poco
+- Shared
+-- Constants
+-- Methods
+
+DataService 
+- provides crud operations
+- allows database to be separated from concerns of other modules
+- provides options to use different databases (or even text based)
+- dependency on Crud and Shared models
+AppService 
+- does not care about database operations
+- provides application logic between the API and Database
+- separates concerns of validation and  database objects and POCO objects
+- dependency on Crud, Poco and Shared models
+API 
+- provides thin controllers and interfaces with the app service
+- dependency on Poco objects and Shared models
+UI
+- provides a web app that makes API calls
+
+UI, API, AppService and DataService can run independently of each other
+API, AppService and DataService have Ping methods to verify connectivity
+DataService has a method to verify the DB of choice is available
+- 
+
+Add later:
+Dockerize (Linux)
+Authentication
+
