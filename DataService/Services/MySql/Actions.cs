@@ -1,29 +1,56 @@
 ﻿using Dapper;
 using Models.DbCrud;
 using MySql.Data.MySqlClient;
+using Npgsql;
+using System.Diagnostics;
 
 namespace DataService.Services.MySql
 {
     public class Actions
     {
-        private static async Task<string> RunCreate(MySqlConnection connection, CreateSql createSql)
+        private static async Task<Response> CreateDatabase(string connectionString, string dbname) 
         {
-            var response = $"| {createSql.TableName}";
+            var response = new Response { Message = $"Request to create {dbname}. " };
             try
             {
-                await connection.ExecuteAsync(createSql.SqlForCreate);
-                response += $" created or exists. ";
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    var createSql = string.Format(Statements.CreateDatabase, dbname);
+                    await connection.ExecuteAsync(createSql);
+                    response.Message += $"| {dbname} create (if not exists) executed. ";
+                }
             }
             catch (Exception ex)
             {
-                response += $"| {ex.Message}";
+                response.Message += ex.Message;
+            }
+            return response;
+        }
+
+        private static async Task<Response> RunCreate(MySqlConnection connection, CreateSql createSql)
+        {
+            var response = new Response();
+            try
+            {
+                using (var cmd = new MySqlCommand(createSql.SqlForCreate, connection)) 
+                {
+                    Debug.WriteLine(cmd.CommandText);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                response.Message = $"| {createSql.TableName} creation executed. ";
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Error = $" {createSql.TableName} | {ex.Message} ";
             }
             return response;
         }
 
         private static async Task<Response> CreateTables(string connectionString, string dbname)
         {
-            var response = new Response();
+            var response = new Response { Success = true };
             try
             {
                 var connectionStringBuilder = new MySqlConnectionStringBuilder(connectionString)
@@ -37,37 +64,31 @@ namespace DataService.Services.MySql
 
                     foreach (CreateSql tableSql in Statements.TableList)
                     {
-                        response.Message += await RunCreate(connection, tableSql);
+                        var createResponse = await RunCreate(connection, tableSql);
+                        response.Message += createResponse.Message;
+                        response.Error += createResponse.Error;
+                        if (!createResponse.Success) 
+                        { 
+                            response.Success = false; 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 response.Message += ex.Message;
+                response.Success = false;
             }
             return response;
         }
 
         public static async Task<Response> InitDb(string connectionString, string dbname)
         {
-            var response = new Response { Message = $"Request to create {dbname}. " };
-            try
-            {
-                using (var connection = new MySqlConnection(connectionString))
-                {
-                    await connection.OpenAsync();
-                    var createSql = string.Format(Statements.CreateDatabase, dbname);
-                    await connection.ExecuteAsync(createSql);
-                    response.Message += $"| {dbname} create (if not exists) executed. ";
-                }
-                var tablesResponse = CreateTables(connectionString, dbname);
-                response.Message += tablesResponse.Result.Message;
-                response.Success = true;
-            }
-            catch (Exception ex)
-            {
-                response.Message += ex.Message;
-            }
+            var response = CreateDatabase(connectionString, dbname).Result;
+            var tablesResponse = await CreateTables(connectionString, dbname);
+            response.Message += tablesResponse.Message;
+            response.Error += tablesResponse.Error;
+            response.Success = tablesResponse.Success;
             return response;
         }
 

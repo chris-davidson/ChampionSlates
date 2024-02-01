@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.DbCrud
 {
-    public class FactionData
+    public class StatData
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

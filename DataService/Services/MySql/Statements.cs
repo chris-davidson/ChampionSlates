@@ -1,4 +1,6 @@
-﻿namespace DataService.Services.MySql
+﻿using Models.DbCrud;
+
+namespace DataService.Services.MySql
 {
     public class CreateSql
     {
@@ -10,75 +12,96 @@
     {
         public static readonly string CreateDatabase = "CREATE DATABASE IF NOT EXISTS {0}";
 
-        private static readonly string CreateTableWorlds = @"
+        private static readonly string CreateTableWorlds = @$"
                 CREATE TABLE IF NOT EXISTS Worlds (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    Name VARCHAR(255),
-                    Abbreviation VARCHAR(50)
+                    {nameof(WorldData.Id)} INT AUTO_INCREMENT PRIMARY KEY,
+                    {nameof(WorldData.Name)} VARCHAR(255),
+                    {nameof(WorldData.Abbr)} VARCHAR(50)
                 );
             ";
 
-        private static readonly string CreateTableAlignments = @"
+        private static readonly string CreateTableAlignments = @$"
                 CREATE TABLE IF NOT EXISTS Alignments (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    Name VARCHAR(255) NOT NULL,
-                    Abbreviation VARCHAR(50) NOT NULL
+                    {nameof(AlignmentData.Id)} INT AUTO_INCREMENT PRIMARY KEY,
+                    {nameof(AlignmentData.Name)} VARCHAR(255) NOT NULL,
+                    {nameof(AlignmentData.Abbr)} VARCHAR(50) NOT NULL,
+                    {nameof(AlignmentData.WorldId)} INT,
+                    FOREIGN KEY ({nameof(AlignmentData.WorldId)})
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static readonly string CreateTableFactions = @"
+        private static readonly string CreateTableFactions = @$"
                 CREATE TABLE IF NOT EXISTS Factions (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    Name VARCHAR(255) NOT NULL,
-                    Abbreviation VARCHAR(50) NOT NULL
+                    {nameof(FactionData.Id)} INT AUTO_INCREMENT PRIMARY KEY,
+                    {nameof(FactionData.Name)} VARCHAR(255) NOT NULL,
+                    {nameof(FactionData.Abbr)} VARCHAR(50) NOT NULL,
+                    {nameof(FactionData.WorldId)} INT,
+                    FOREIGN KEY ({nameof(FactionData.WorldId)})
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static readonly string CreateTableCharacters = @"
+        private static readonly string CreateTableCharacters = @$"
                 CREATE TABLE IF NOT EXISTS Characters (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    FirstName VARCHAR(255) NOT NULL,
-                    LastName VARCHAR(255),
-                    AlignmentId INT,
-                    FactionId INT,
-                    FOREIGN KEY (AlignmentId) REFERENCES Alignments(Id),
-                    FOREIGN KEY (FactionId) REFERENCES Factions(Id)
+                    {nameof(ChampData.Id)} INT AUTO_INCREMENT PRIMARY KEY,
+                    {nameof(ChampData.Title)} VARCHAR(255),
+                    {nameof(ChampData.FirstName)} VARCHAR(255) NOT NULL,
+                    {nameof(ChampData.LastName)} VARCHAR(255),
+                    {nameof(ChampData.AlignmentId)} INT,
+                    {nameof(ChampData.FactionId)} INT,
+                    {nameof(ChampData.WorldId)} INT,
+                    FOREIGN KEY ({nameof(ChampData.AlignmentId)}) 
+                        REFERENCES Alignments({nameof(AlignmentData.Id)}),
+                    FOREIGN KEY ({nameof(ChampData.FactionId)}) 
+                        REFERENCES Factions({nameof(FactionData.Id)}),
+                    FOREIGN KEY ({nameof(ChampData.WorldId)})
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static string CreateTableStats = @"
+        private static string CreateTableStats = @$"
                 CREATE TABLE IF NOT EXISTS StatNames (
-                    Id INT AUTO_INCREMENT PRIMARY KEY,
-                    Name VARCHAR(255) NOT NULL,
-                    Abbreviation VARCHAR(50) NOT NULL
+                    {nameof(StatData.Id)} INT AUTO_INCREMENT PRIMARY KEY,
+                    {nameof(StatData.Name)} VARCHAR(255) NOT NULL,
+                    {nameof(StatData.Abbr)} VARCHAR(50) NOT NULL,
+                    {nameof(StatData.WorldId)} INT,
+                    FOREIGN KEY ({nameof(StatData.WorldId)})
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static string CreateTableCharStats = @"
+        private static string CreateTableCharStats = @$"
                 CREATE TABLE IF NOT EXISTS CharStats (
-                    CharId INT,
-                    StatId INT,
-                    Value VARCHAR(50),
-                    FOREIGN KEY (CharId) REFERENCES Characters(Id),
-                    FOREIGN KEY (StatId) REFERENCES StatNames(Id)
+                    {nameof(CharStatData.CharId)} INT,
+                    {nameof(CharStatData.StatId)} INT,
+                    {nameof(CharStatData.Value)} VARCHAR(50),
+                    FOREIGN KEY ({nameof(CharStatData.CharId)}) 
+                        REFERENCES Characters({nameof(ChampData.Id)}),
+                    FOREIGN KEY ({nameof(CharStatData.StatId)}) 
+                        REFERENCES StatNames({nameof(StatData.Id)})
                 );
             ";
 
-        private static string CreateTableCharAlign = @"
+        private static string CreateTableCharAlign = @$"
                 CREATE TABLE IF NOT EXISTS CharAlign (
-                    CharId INT,
-                    AlignId INT,
-                    FOREIGN KEY (CharId) REFERENCES Characters(Id),
-                    FOREIGN KEY (CharId) REFERENCES Alignments(Id)
+                    {nameof(CharAlignData.CharId)} INT,
+                    {nameof(CharAlignData.AlignmentId)} INT,
+                    FOREIGN KEY ({nameof(CharAlignData.CharId)}) 
+                        REFERENCES Characters({nameof(ChampData.Id)}),
+                    FOREIGN KEY ({nameof(CharAlignData.AlignmentId)}) 
+                        REFERENCES Alignments({nameof(AlignmentData.Id)})
                 );
             ";
 
-        private static string CreateTableCharFaction = @"
+        private static string CreateTableCharFaction = @$"
                 CREATE TABLE IF NOT EXISTS CharFaction (
-                    CharId INT,
-                    FactionId INT,
-                    FOREIGN KEY (CharId) REFERENCES Characters(Id),
-                    FOREIGN KEY (FactionId) REFERENCES Factions(Id)
+                    {nameof(CharFactionData.CharId)} INT,
+                    {nameof(CharFactionData.FactionId)} INT,
+                    FOREIGN KEY ({nameof(CharFactionData.CharId)}) 
+                        REFERENCES Characters({nameof(ChampData.Id)}),
+                    FOREIGN KEY ({nameof(CharFactionData.FactionId)}) 
+                        REFERENCES Factions({nameof(FactionData.Id)})
                 );
             ";
 

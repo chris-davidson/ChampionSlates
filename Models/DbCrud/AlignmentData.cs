@@ -11,5 +11,6 @@ namespace Models.DbCrud
         public int Id { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
         public string Abbr { get; set; } = string.Empty;
+        public int WorldId { get; set; }
     }
 }

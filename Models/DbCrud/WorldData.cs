@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Models.DbCrud
 {
-    public class FactionData
+    public class WorldData
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Abbr { get; set; } = string.Empty;
-        public int WorldId { get; set; }
     }
 }

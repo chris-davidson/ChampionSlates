@@ -17,7 +17,7 @@ var championDatabase = config["DatabaseName"] ?? string.Empty;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-if (databaseName.ToLower().Contains("postgres"))
+if (databaseName.ToLower().Contains("postgre"))
 {
     builder.Services.AddScoped<ICrudOperations>(serviceProvider =>
     {

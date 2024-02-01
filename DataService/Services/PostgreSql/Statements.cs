@@ -1,4 +1,6 @@
-﻿namespace DataService.Services.PostgreSql
+﻿using Models.DbCrud;
+
+namespace DataService.Services.PostgreSql
 {
     public class CreateSql
     {
@@ -11,67 +13,84 @@
         public static readonly string DbExists = "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = '{0}');";
         public static readonly string CreateDatabase = "CREATE DATABASE \"{0}\"";
 
-        private static readonly string CreateTableWorlds = @"
+        private static readonly string CreateTableWorlds = @$"
                 CREATE TABLE IF NOT EXISTS Worlds (
-                    Id SERIAL PRIMARY KEY,
-                    Name VARCHAR,
-                    Abbreviation VARCHAR
+                    {nameof(WorldData.Id)} SERIAL PRIMARY KEY,
+                    {nameof(WorldData.Name)} VARCHAR,
+                    {nameof(WorldData.Abbr)} VARCHAR
                 );
             ";
         
-        private static readonly string CreateTableAlignments = @"
+        private static readonly string CreateTableAlignments = @$"
                 CREATE TABLE IF NOT EXISTS Alignments (
-                    Id SERIAL PRIMARY KEY,
-                    Name VARCHAR,
-                    Abbreviation VARCHAR
+                    {nameof(AlignmentData.Id)} SERIAL PRIMARY KEY,
+                    {nameof(AlignmentData.Name)} VARCHAR,
+                    {nameof(AlignmentData.Abbr)} VARCHAR,
+                    {nameof(AlignmentData.WorldId)} INTEGER
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static readonly string CreateTableFactions = @"
+        private static readonly string CreateTableFactions = @$"
                 CREATE TABLE IF NOT EXISTS Factions (
-                    Id SERIAL PRIMARY KEY,
-                    Name VARCHAR,
-                    Abbreviation VARCHAR
+                    {nameof(FactionData.Id)} SERIAL PRIMARY KEY,
+                    {nameof(FactionData.Name)} VARCHAR,
+                    {nameof(FactionData.Abbr)} VARCHAR,
+                    {nameof(FactionData.WorldId)} INTEGER
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static readonly string CreateTableCharacters = @"
+        private static readonly string CreateTableCharacters = @$"
                 CREATE TABLE IF NOT EXISTS Characters (
-                    Id SERIAL PRIMARY KEY,
-                    FirstName VARCHAR,
-                    LastName VARCHAR,
-                    AlignmentId INTEGER REFERENCES Alignments(Id),
-                    FactionId INTEGER REFERENCES Factions(Id)
+                    {nameof(ChampData.Id)} SERIAL PRIMARY KEY,
+                    {nameof(ChampData.Title)} VARCHAR,
+                    {nameof(ChampData.FirstName)} VARCHAR,
+                    {nameof(ChampData.LastName)} VARCHAR,
+                    {nameof(ChampData.AlignmentId)} INTEGER 
+                        REFERENCES Alignments({nameof(AlignmentData.Id)}),
+                    {nameof(ChampData.FactionId)} INTEGER 
+                        REFERENCES Factions({nameof(FactionData.Id)}),
+                    {nameof(ChampData.WorldId)} INTEGER
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static string CreateTableStats = @"
+        private static string CreateTableStats = @$"
                 CREATE TABLE IF NOT EXISTS StatNames (
-                    Id SERIAL PRIMARY KEY,
-                    Name VARCHAR,
-                    Abbreviation VARCHAR
+                    {nameof(StatData.Id)} SERIAL PRIMARY KEY,
+                    {nameof(StatData.Name)} VARCHAR,
+                    {nameof(StatData.Abbr)} VARCHAR,
+                    {nameof(StatData.WorldId)} INTEGER
+                        REFERENCES Worlds({nameof(WorldData.Id)})
                 );
             ";
 
-        private static string CreateTableCharStats = @"
+        private static string CreateTableCharStats = @$"
                 CREATE TABLE IF NOT EXISTS CharStats (
-                    CharId INTEGER REFERENCES Characters(Id),
-                    StatId INTEGER REFERENCES StatNames(Id),
-                    Value VARCHAR
+                    {nameof(CharStatData.CharId)} INTEGER 
+                        REFERENCES Characters({nameof(ChampData.Id)}),
+                    {nameof(CharStatData.StatId)} INTEGER 
+                        REFERENCES StatNames({nameof(StatData.Id)}),
+                    {nameof(CharStatData.Value)} VARCHAR
                 );
             ";
 
-        private static string CreateTableCharAlign = @"
+        private static string CreateTableCharAlign = @$"
                 CREATE TABLE IF NOT EXISTS CharAlign (
-                    CharId INTEGER REFERENCES Characters(Id),
-                    AlignId INTEGER REFERENCES Alignments(Id)
+                    {nameof(CharAlignData.CharId)} INTEGER 
+                        REFERENCES Characters({nameof(ChampData.Id)}),
+                    {nameof(CharAlignData.AlignmentId)} INTEGER 
+                        REFERENCES Alignments({nameof(AlignmentData.Id)})
                 );
             ";
 
-        private static string CreateTableCharFaction = @"
+        private static string CreateTableCharFaction = @$"
                 CREATE TABLE IF NOT EXISTS CharFaction (
-                    CharId INTEGER REFERENCES Characters(Id),
-                    FactionId INTEGER REFERENCES Factions(Id)
+                    {nameof(CharFactionData.CharId)} INTEGER 
+                        REFERENCES Characters({nameof(ChampData.Id)}),              
+                    {nameof(CharFactionData.FactionId)} INTEGER 
+                        REFERENCES Factions({nameof(FactionData.Id)})
                 );
             ";
 
